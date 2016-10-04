@@ -85,6 +85,7 @@ function Setup:parseOptions(arg)
   cmd:option('-env', 'rlenvs.Catch', 'Environment class (Lua file to be loaded/rlenv)')
   cmd:option('-zoom', 1, 'Display zoom (requires QT)')
   cmd:option('-game', '', 'Name of Atari ROM (stored in "roms" directory)')
+  cmd:option('-core', '', 'Name of the RLE core atari/snes')
   -- Training vs. evaluate mode
   cmd:option('-mode', 'train', 'Train vs. test mode: train|eval')
   -- State preprocessing options (for visual states)
