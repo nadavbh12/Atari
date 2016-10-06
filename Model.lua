@@ -74,7 +74,7 @@ function Model:createBody()
   if paths.filep(self.modelBody .. '.lua') then
     net = require(self.modelBody)
     net:type(self.tensorType)
-  elseif self.env == 'rlenvs.Atari' then
+  elseif self.env == 'rlenvs.Atari' or self.env == 'rlenvs.Rle' then
     net = nn.Sequential()
     net:add(nn.View(histLen*self.stateSpec[2][1], self.stateSpec[2][2], self.stateSpec[2][3])) -- Concatenate history in channel dimension
     net:add(nn.SpatialConvolution(histLen*self.stateSpec[2][1], 32, 8, 8, 4, 4, 1, 1))

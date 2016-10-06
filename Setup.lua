@@ -36,7 +36,7 @@ function Setup:_init(arg)
   self:validateOptions()
 
   -- Augment environments to meet spec
-  self:augmentEnv()
+--  self:augmentEnv()
 
   -- Torch setup
   log.info('Setting up Torch7')
@@ -185,14 +185,18 @@ function Setup:parseOptions(arg)
   end
   
   -- Create one environment to extract specifications
-  local Env = require(opt.env)
-  local env = Env(opt)
-  opt.stateSpec = env:getStateSpec()
-  opt.actionSpec = env:getActionSpec()
+--  local Env = require(opt.env)
+--  local env = Env(opt)
+--  opt.stateSpec = env:getStateSpec()
+  opt.stateSpec = {'real', {3, 224, 256}, {0, 1}}
+--  opt.actionSpec = env:getActionSpec()
+  opt.actionSpec = {'int', 1, {1, 23}}
   -- Process display if available (can be used for saliency recordings even without QT)
-  if env.getDisplay then
-    opt.displaySpec = env:getDisplaySpec()
-  end
+--  if env.getDisplay then
+----    opt.displaySpec = env:getDisplaySpec()
+    opt.displaySpec = {'real', {3, 224, 256}, {0, 1}}
+--  end
+  
 
   return opt
 end
