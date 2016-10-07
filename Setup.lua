@@ -190,7 +190,20 @@ function Setup:parseOptions(arg)
 --  opt.stateSpec = env:getStateSpec()
   opt.stateSpec = {'real', {3, 224, 256}, {0, 1}}
 --  opt.actionSpec = env:getActionSpec()
-  opt.actionSpec = {'int', 1, {1, 23}}
+  local numActions = nil
+  if opt.game == 'mortal_kombat.sfc' then
+    numActions = 23
+  elseif opt.game == 'f_zero.sfc' then
+    numActions = 5
+  elseif opt.game == 'final_fight.sfc' then
+    numActions = 17
+  elseif opt.game == 'gradius_iii.sfc' then
+    numActions = 20
+  elseif opt.game == 'super_mario_all_stars.sfc' then
+    numActions = 11
+  end
+  
+  opt.actionSpec = {'int', 1, {1, numActions}}
   -- Process display if available (can be used for saliency recordings even without QT)
 --  if env.getDisplay then
 ----    opt.displaySpec = env:getDisplaySpec()
