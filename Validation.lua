@@ -21,6 +21,8 @@ function Validation:_init(opt, agent, env, display)
 
   self.bestValScore = _.max(self.agent.valScores) or -math.huge -- Retrieve best validation score from agent if available
 
+  self.evalEpisodes = opt.evalEpisodes
+
   classic.strict(self)
 end
 
@@ -117,33 +119,39 @@ function Validation:evaluate()
   -- Set environment and agent to evaluation mode
   self.env:evaluate()
   self.agent:evaluate()
-
-  local reward, state, terminal = 0, self.env:start(), false
-
+  
+  local reward, state, terminal
+  
   -- Report episode score
-  local episodeScore = reward
+  local episodeScore
 
-  -- Play one game (episode)
-  local step = 1
-  while not terminal do
-    -- Observe and choose next action (index)
-    action = self.agent:observe(reward, state, terminal)
-    -- Act on environment
-    reward, state, terminal = self.env:step(action)
-    episodeScore = episodeScore + reward
-
-    -- Record (if available)
-    if self.hasDisplay then
-      self.display:display(self.agent, self.env:getDisplay(), step)
+  -- Play evalEpisodes games (episodes)
+  for episodeNum = 1, self.evalEpisodes do
+    reward, state, terminal = 0, self.env:start(), false
+  
+    episodeScore = reward
+  
+    local step = 1
+    while not terminal do
+      -- Observe and choose next action (index)
+      action = self.agent:observe(reward, state, terminal)
+      -- Act on environment
+      reward, state, terminal = self.env:step(action)
+      episodeScore = episodeScore + reward
+  
+      -- Record (if available)
+      if self.hasDisplay then
+        self.display:display(self.agent, self.env:getDisplay(), step)
+      end
+      -- Increment evaluation step counter
+      step = step + 1
     end
-    -- Increment evaluation step counter
-    step = step + 1
-  end
-  log.info('Final Score: ' .. episodeScore)
-
-  -- Record (if available)
-  if self.hasDisplay then
-    self.display:createVideo()
+    log.info('Final Score, episode ' .. episodeNum ..': ' .. episodeScore)
+  
+    -- Record (if available)
+    if self.hasDisplay and episodeNum == 1 then
+      self.display:createVideo()
+    end
   end
 end
 
