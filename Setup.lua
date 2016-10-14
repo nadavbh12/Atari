@@ -153,6 +153,7 @@ function Setup:parseOptions(arg)
   cmd:option('-verbose', 'false', 'Log info for every episode (only in train mode)')
   cmd:option('-saliency', '', 'Display saliency maps (requires QT): <none>|normal|guided|deconvnet')
   cmd:option('-record', 'false', 'Record screen (only in eval mode)')
+  cmd:option('-evalEpisodes', '1', 'Number of episodes in evaluation mode')
   local opt = cmd:parse(arg)
 
   -- Process boolean options (Torch fails to accept false on the command line)

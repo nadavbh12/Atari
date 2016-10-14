@@ -52,6 +52,8 @@ function ValidationAgent:_init(opt, theta, atomic)
   self.selectAction = self.eGreedyAction
   self.a3c = opt.async == 'A3C'
   if self.a3c then self.selectAction = self.probabilisticAction end
+  
+  self.evalEpisodes = opt.evalEpisodes
 
   classic.strict(self)
 end
@@ -311,42 +313,50 @@ function ValidationAgent:evaluate(display)
   -- Set environment and agent to evaluation mode
   self.env:evaluate()
 
-  local reward, observation, terminal = 0, self.env:start(), false
+  local reward, observation, terminal
 
   -- Report episode score
-  local episodeScore = reward
+  local episodeScore
 
   -- Play one game (episode)
-  local step = 1
-  while not terminal do
-    observation = self.model:preprocess(observation)
-    if terminal then
-      self.stateBuffer:pushReset(observation)
-    else
-      self.stateBuffer:push(observation)
+  for episodeNum = 1, self.evalEpisodes do
+    reward, observation, terminal = 0, self.env:start(), false
+  
+    -- Report episode score
+    episodeScore = reward
+  
+    local step = 1
+    while not terminal do
+      observation = self.model:preprocess(observation)
+      if terminal then
+        self.stateBuffer:pushReset(observation)
+      else
+        self.stateBuffer:push(observation)
+      end
+      -- Observe and choose next action (index)
+      local state = self.stateBuffer:readAll()
+      local action = self:selectAction(state)
+    
+      -- Act on environment
+      if not terminal then
+        reward, observation, terminal = self.env:step(action - self.actionOffset)
+      else 
+        reward, observation, terminal = 0, self.env:start(), false
+      end
+      episodeScore = episodeScore + reward
+    
+      if display then
+        display:display(self, self.env:getDisplay(), step)
+      end
+      -- Increment evaluation step counter
+      step = step + 1
     end
-    -- Observe and choose next action (index)
-    local state = self.stateBuffer:readAll()
-    local action = self:selectAction(state)
-
-    -- Act on environment
-    if not terminal then
-      reward, observation, terminal = self.env:step(action - self.actionOffset)
-    else 
-      reward, observation, terminal = 0, self.env:start(), false
+    log.info('Final Score, episode ' .. episodeNum ..': ' .. episodeScore)
+    
+    
+    if display and episodeNum == 1 then
+      display:createVideo()
     end
-    episodeScore = episodeScore + reward
-
-    if display then
-      display:display(self, self.env:getDisplay(), step)
-    end
-    -- Increment evaluation step counter
-    step = step + 1
-  end
-  log.info('Final Score: ' .. episodeScore)
-
-  if display then
-    display:createVideo()
   end
 end
 
