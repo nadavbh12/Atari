@@ -31,7 +31,6 @@ function Setup:_init(arg)
   local flog = logroll.file_logger(paths.concat(self.opt.experiments, self.opt._id, 'log.txt'))
   local plog = logroll.print_logger()
   log = logroll.combine(flog, plog) -- Global logger
-
   -- Validate command-line options (logging errors)
   self:validateOptions()
 
@@ -154,6 +153,7 @@ function Setup:parseOptions(arg)
   cmd:option('-saliency', '', 'Display saliency maps (requires QT): <none>|normal|guided|deconvnet')
   cmd:option('-record', 'false', 'Record screen (only in eval mode)')
   cmd:option('-evalEpisodes', '1', 'Number of episodes in evaluation mode')
+  cmd:option('-saveAgents', 50 , 'Number of agents to save')  
   local opt = cmd:parse(arg)
 
   -- Process boolean options (Torch fails to accept false on the command line)

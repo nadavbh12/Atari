@@ -4,12 +4,15 @@ local gnuplot = require 'gnuplot'
 local Evaluator = require 'Evaluator'
 
 local Validation = classic.class('Validation')
-
 function Validation:_init(opt, agent, env, display)
   self.opt = opt
   self.agent = agent
   self.env = env
-
+  self.saveInd = 0
+  --Set up Results log
+  self.rFile = io.open(paths.concat(self.opt.experiments, self.opt._id, "Results.txt"), "w") -- Global results
+  self.rFile:write("Total Score\t Average Score\t Averaged Q\t Delta\n")
+    self.rFile:flush()
   self.hasDisplay = false
   if display then
     self.hasDisplay = true
@@ -72,8 +75,7 @@ function Validation:validate()
   -- If no episodes completed then use score from incomplete episode
   if valEpisode == 1 then
     valTotalScore = valEpisodeScore
-  end
-
+  end  
   -- Print total and average score
   log.info('Total Score: ' .. valTotalScore)
   valTotalScore = valTotalScore/math.max(valEpisode - 1, 1) -- Only average score for completed episodes in general
@@ -94,11 +96,17 @@ function Validation:validate()
   local avgV, avgTdErr = self.agent:validate()
   log.info('Average V: ' .. avgV)
   log.info('Average δ: ' .. avgTdErr)
-  
+  --print results
+  self.rFile:write(valTotalScore .."\t "..valTotalScore.."\t "..avgV .."\t "..avgTdErr .."\n")
+  self.rFile:flush()
   -- Save latest weights
   log.info('Saving weights')
   self.agent:saveWeights(paths.concat(self.opt.experiments, self.opt._id, 'last.weights.t7'))
-
+  --saving several weights
+  log.info("Saved Network Index: " .. self.saveInd)
+  local weightName = 'weights'..self.saveInd..'.t7'
+  self.agent:saveWeights(paths.concat(self.opt.experiments, self.opt._id, weightName))
+  self.saveInd=(self.saveInd+1) % self.opt.saveAgents
   -- Save "best weights" if best score achieved
   if valTotalScore > self.bestValScore then
     log.info('New best average score')

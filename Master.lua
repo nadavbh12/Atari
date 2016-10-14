@@ -18,6 +18,7 @@ function Master:_init(opt)
   self.valFreq = opt.valFreq
   self.experiments = opt.experiments
   self._id = opt._id
+  self.saveAgents = opt.saveAgents
 
   -- Set up singleton global object for transferring step
   self.globals = Singleton({step = 1}) -- Initial step
