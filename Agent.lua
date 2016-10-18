@@ -182,7 +182,7 @@ function Agent:observe(reward, rawObservation, terminal)
 
       -- Plot uncertainty in ensemble policy
       if qt then
-        gnuplot.hist(QHeadsMaxInds, self.m, 0.5, self.m + 0.5)
+        --gnuplot.hist(QHeadsMaxInds, self.m, 0.5, self.m + 0.5)
       end
 
       -- Compute saliency map
@@ -498,49 +498,49 @@ function Agent:validate()
   -- Plot and save losses
   if #self.losses > 0 then
     local losses = torch.Tensor(self.losses)
-    gnuplot.pngfigure(paths.concat(self.experiments, self._id, 'losses.png'))
-    gnuplot.plot('Loss', torch.linspace(math.floor(self.learnStart/self.progFreq), math.floor(self.globals.step/self.progFreq), #self.losses), losses, '-')
-    gnuplot.xlabel('Step (x' .. self.progFreq .. ')')
-    gnuplot.ylabel('Loss')
-    gnuplot.plotflush()
+    --gnuplot.pngfigure(paths.concat(self.experiments, self._id, 'losses.png'))
+    --gnuplot.plot('Loss', torch.linspace(math.floor(self.learnStart/self.progFreq), math.floor(self.globals.step/self.progFreq), #self.losses), losses, '-')
+    --gnuplot.xlabel('Step (x' .. self.progFreq .. ')')
+    --gnuplot.ylabel('Loss')
+    --gnuplot.plotflush()
     torch.save(paths.concat(self.experiments, self._id, 'losses.t7'), losses)
   end
   -- Plot and save V
   local epochIndices = torch.linspace(1, #self.avgV, #self.avgV)
   local Vs = torch.Tensor(self.avgV)
-  gnuplot.pngfigure(paths.concat(self.experiments, self._id, 'Vs.png'))
-  gnuplot.plot('V', epochIndices, Vs, '-')
-  gnuplot.xlabel('Epoch')
-  gnuplot.ylabel('V')
-  gnuplot.movelegend('left', 'top')
-  gnuplot.plotflush()
+  --gnuplot.pngfigure(paths.concat(self.experiments, self._id, 'Vs.png'))
+  --gnuplot.plot('V', epochIndices, Vs, '-')
+  --gnuplot.xlabel('Epoch')
+  --gnuplot.ylabel('V')
+  --gnuplot.movelegend('left', 'top')
+  --gnuplot.plotflush()
   torch.save(paths.concat(self.experiments, self._id, 'V.t7'), Vs)
   -- Plot and save TD-error δ
   local TDErrors = torch.Tensor(self.avgTdErr)
-  gnuplot.pngfigure(paths.concat(self.experiments, self._id, 'TDErrors.png'))
-  gnuplot.plot('TD-Error', epochIndices, TDErrors, '-')
-  gnuplot.xlabel('Epoch')
-  gnuplot.ylabel('TD-Error')
-  gnuplot.plotflush()
+  --gnuplot.pngfigure(paths.concat(self.experiments, self._id, 'TDErrors.png'))
+  --gnuplot.plot('TD-Error', epochIndices, TDErrors, '-')
+  --gnuplot.xlabel('Epoch')
+  --gnuplot.ylabel('TD-Error')
+  --gnuplot.plotflush()
   torch.save(paths.concat(self.experiments, self._id, 'TDErrors.t7'), TDErrors)
   -- Plot and save average score
   local scores = torch.Tensor(self.valScores)
-  gnuplot.pngfigure(paths.concat(self.experiments, self._id, 'scores.png'))
-  gnuplot.plot('Score', epochIndices, scores, '-')
-  gnuplot.xlabel('Epoch')
-  gnuplot.ylabel('Average Score')
-  gnuplot.movelegend('left', 'top')
-  gnuplot.plotflush()
+  --gnuplot.pngfigure(paths.concat(self.experiments, self._id, 'scores.png'))
+  --gnuplot.plot('Score', epochIndices, scores, '-')
+  --gnuplot.xlabel('Epoch')
+  --gnuplot.ylabel('Average Score')
+  --gnuplot.movelegend('left', 'top')
+  --gnuplot.plotflush()
   torch.save(paths.concat(self.experiments, self._id, 'scores.t7'), scores)
     -- Plot and save normalised score
   if #self.normScores > 0 then
     local normScores = torch.Tensor(self.normScores)
-    gnuplot.pngfigure(paths.concat(self.experiments, self._id, 'normScores.png'))
-    gnuplot.plot('Score', epochIndices, normScores, '-')
-    gnuplot.xlabel('Epoch')
-    gnuplot.ylabel('Normalised Score')
-    gnuplot.movelegend('left', 'top')
-    gnuplot.plotflush()
+    --gnuplot.pngfigure(paths.concat(self.experiments, self._id, 'normScores.png'))
+    --gnuplot.plot('Score', epochIndices, normScores, '-')
+    --gnuplot.xlabel('Epoch')
+    --gnuplot.ylabel('Normalised Score')
+    --gnuplot.movelegend('left', 'top')
+    --gnuplot.plotflush()
     torch.save(paths.concat(self.experiments, self._id, 'normScores.t7'), normScores)
   end
 
@@ -552,7 +552,7 @@ function Agent:visualiseFilters()
   local filters = self.model:getFilters()
 
   for i, v in ipairs(filters) do
-    image.save(paths.concat(self.experiments, self._id, 'conv_layer_' .. i .. '.png'), v)
+--    image.save(paths.concat(self.experiments, self._id, 'conv_layer_' .. i .. '.png'), v)
   end
 end
 

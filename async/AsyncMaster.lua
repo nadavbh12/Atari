@@ -90,9 +90,7 @@ end
 
 function AsyncMaster:_init(opt)
   self.opt = opt
-
   self.stateFile = paths.concat('experiments', opt._id, 'agent.async.t7')
-
   local asyncModel = AsyncModel(opt)
   local policyNet = asyncModel:createNet()
   self.theta = policyNet:getParameters()
@@ -133,7 +131,6 @@ function AsyncMaster:_init(opt)
         local globalSteps = atomic:get()
         local state = { globalSteps = globalSteps }
         torch.save(stateFile, state)
-
         validAgent:saveWeights('last')
         log.warn('Exiting')
         os.exit(128 + signum)
