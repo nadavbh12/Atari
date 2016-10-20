@@ -14,7 +14,8 @@ function ValidationAgent:_init(opt, theta, atomic)
   local asyncModel = AsyncModel(opt)
   self.env, self.model = asyncModel:getEnvAndModel()
   self.policyNet_ = asyncModel:createNet()
-
+  self.saveInd=0
+  self.saveAgents = opt.saveAgents
   self.lstm = opt.recurrent and self.policyNet_:findModules('nn.FastLSTM')[1]
 
   self.theta_ = self.policyNet_:getParameters()
@@ -160,10 +161,10 @@ function ValidationAgent:validate()
   end
 
   self:visualiseFilters()
-
+  
   local avgV = self:validationStats()
   log.info('Average V: ' .. avgV)
-
+  self:saveWeights('last') --saving last weights
   if valAvgScore > self.bestValScore then
     log.info('New best average score')
     self.bestValScore = valAvgScore
@@ -180,7 +181,13 @@ end
 
 function ValidationAgent:saveWeights(name)
   log.info('Saving weights')
-  torch.save(paths.concat('experiments', self._id, name..'.weights.t7'), self.theta)
+  if (name == 'best') then --best is saved only once
+    torch.save(paths.concat('experiments', self._id, name..'.weights.t7'), self.theta)
+  else
+    torch.save(paths.concat('experiments', self._id,'weights_'..self.saveInd..'.t7'), self.theta)    
+    torch.save(paths.concat('experiments', self._id, name..'.weights.t7'), self.theta) -- will save the "last" as well.
+    self.saveInd=(self.saveInd+1) % self.saveAgents
+  end
 end
 
 -- Saves network convolutional filters as images
