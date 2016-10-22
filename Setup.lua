@@ -85,6 +85,8 @@ function Setup:parseOptions(arg)
   cmd:option('-zoom', 1, 'Display zoom (requires QT)')
   cmd:option('-game', '', 'Name of Atari ROM (stored in "roms" directory)')
   cmd:option('-core', '', 'Name of the RLE core atari/snes')
+  cmd:option('-twoPlayers', 'false', 'allow two players two play against each other')
+  cmd:option('-playerTwoOptionsFile', '', 'options file for second player')
   -- Training vs. evaluate mode
   cmd:option('-mode', 'train', 'Train vs. test mode: train|eval')
   -- State preprocessing options (for visual states)
@@ -167,6 +169,7 @@ function Setup:parseOptions(arg)
   opt.verbose = opt.verbose == 'true'
   opt.record = opt.record == 'true'
   opt.noValidation = opt.noValidation == 'true'
+  opt.twoPlayers = opt.twoPlayers == 'true'
 
   -- Process boolean/enum options
   if opt.colorSpace == '' then opt.colorSpace = false end

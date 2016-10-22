@@ -325,7 +325,7 @@ function ValidationAgent:evaluate(display)
   -- Report episode score
   local episodeScore
 
-  -- Play one game (episode)
+  -- Play evalEpisodes games (episodes)
   for episodeNum = 1, self.evalEpisodes do
     reward, observation, terminal = 0, self.env:start(), false
   

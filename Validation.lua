@@ -4,15 +4,22 @@ local gnuplot = require 'gnuplot'
 local Evaluator = require 'Evaluator'
 
 local Validation = classic.class('Validation')
-function Validation:_init(opt, agent, env, display)
+function Validation:_init(opt, agent, env, display, opt2, agent2)
   self.opt = opt
+  self.opt2 = opt2
   self.agent = agent
+  self.agent2 = agent2 or false
   self.env = env
   self.saveInd = 0
   --Set up Results log
   self.rFile = io.open(paths.concat(self.opt.experiments, self.opt._id, "Results.txt"), "w") -- Global results
   self.rFile:write("Total Score\t Average Score\t Averaged Q\t Delta\n")
-    self.rFile:flush()
+  self.rFile:flush()
+  if self.agent2 then
+    self.rFile2 = io.open(paths.concat(self.opt.experiments, self.opt._id, "Results2.txt"), "w") -- Global results
+    self.rFile2:write("Total Score\t Average Score\t Averaged Q\t Delta\n")
+    self.rFile2:flush()
+  end
   self.hasDisplay = false
   if display then
     self.hasDisplay = true
@@ -35,6 +42,9 @@ function Validation:validate()
   -- Set environment and agent to evaluation mode
   self.env:evaluate()
   self.agent:evaluate()
+  if self.agent2 then
+    self.agent2:evaluate()
+  end
 
   -- Start new game
   local reward, state, terminal = 0, self.env:start(), false
@@ -47,10 +57,15 @@ function Validation:validate()
 
   for valStep = 1, self.opt.valSteps do
     -- Observe and choose next action (index)
-    local action = self.agent:observe(reward, state, terminal)
+    local actionA = self.agent:observe(reward, state, terminal)
+    local actionB = nil    
+    if self.agent2 then
+        actionB = self.agent2:observe(-reward, state, terminal)
+    end
+    
     if not terminal then
       -- Act on environment
-      reward, state, terminal = self.env:step(action)
+      reward, state, terminal = self.env:step(actionA, actionB)
       -- Track score
       valEpisodeScore = valEpisodeScore + reward
     else
@@ -94,11 +109,17 @@ function Validation:validate()
 
   -- Use transitions sampled for validation to test performance
   local avgV, avgTdErr = self.agent:validate()
+  
   log.info('Average V: ' .. avgV)
   log.info('Average δ: ' .. avgTdErr)
   --print results
   self.rFile:write(valTotalScore .."\t "..valTotalScore.."\t "..avgV .."\t "..avgTdErr .."\n")
   self.rFile:flush()
+  if self.agent2 then
+    local avgV2, avgTdErr2 = self.agent2:validate()
+    self.rFile2:write(-valTotalScore .."\t "..-valTotalScore.."\t "..avgV2 .."\t "..avgTdErr2 .."\n")
+    self.rFile2:flush()
+  end  
   -- Save latest weights
   log.info('Saving weights')
   self.agent:saveWeights(paths.concat(self.opt.experiments, self.opt._id, 'last.weights.t7'))
@@ -106,6 +127,9 @@ function Validation:validate()
   log.info("Saved Network Index: " .. self.saveInd)
   local weightName = 'weights'..self.saveInd..'.t7'
   self.agent:saveWeights(paths.concat(self.opt.experiments, self.opt._id, weightName))
+  if self.agent2 then
+    self.agent2:saveWeights(paths.concat(self.opt.experiments, self.opt2._id, weightName))
+  end
   self.saveInd=(self.saveInd+1) % self.opt.saveAgents
   -- Save "best weights" if best score achieved
   if valTotalScore > self.bestValScore then
@@ -119,6 +143,9 @@ function Validation:validate()
   -- Set environment and agent to training mode
   self.env:training()
   self.agent:training()
+  if self.agent2 then
+    self.agent2:training()
+  end
 end
 
 
@@ -127,6 +154,7 @@ function Validation:evaluate()
   -- Set environment and agent to evaluation mode
   self.env:evaluate()
   self.agent:evaluate()
+  self.agent2:evaluate()
   
   local reward, state, terminal
   
@@ -138,13 +166,21 @@ function Validation:evaluate()
     reward, state, terminal = 0, self.env:start(), false
   
     episodeScore = reward
+    
+    local actionA = nil
+    local actionB = nil
   
     local step = 1
     while not terminal do
       -- Observe and choose next action (index)
-      action = self.agent:observe(reward, state, terminal)
+      actionA = self.agent:observe(reward, state, terminal)
+      if self.self.agent2 then
+        actionB = self.agent2:observe(-reward, state, terminal)
+      else
+        actionB = nil
+      end
       -- Act on environment
-      reward, state, terminal = self.env:step(action)
+      reward, state, terminal = self.env:step(actionA, actionB)
       episodeScore = episodeScore + reward
   
       -- Record (if available)

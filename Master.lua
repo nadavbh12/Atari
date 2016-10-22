@@ -8,8 +8,9 @@ local Validation = require 'Validation'
 local Master = classic.class('Master')
 
 -- Sets up environment and agent
-function Master:_init(opt)
+function Master:_init(opt, opt2)
   self.opt = opt
+  self.opt2 = opt2 or nil
   self.verbose = opt.verbose
   self.learnStart = opt.learnStart
   self.progFreq = opt.progFreq
@@ -18,7 +19,9 @@ function Master:_init(opt)
   self.valFreq = opt.valFreq
   self.experiments = opt.experiments
   self._id = opt._id
+  self._id2 = opt2._id
   self.saveAgents = opt.saveAgents
+  self.twoPlayers = opt.twoPlayers
 
   -- Set up singleton global object for transferring step
   self.globals = Singleton({step = 1}) -- Initial step
@@ -31,6 +34,10 @@ function Master:_init(opt)
   -- Create DQN agent
   log.info('Creating DQN')
   self.agent = Agent(opt)
+  if self.twoPlayers then
+    self.agent2 = Agent(opt2)
+  end
+  
   if paths.filep(opt.network) then
     -- Load saved agent if specified
     log.info('Loading pretrained network weights')
@@ -50,6 +57,12 @@ function Master:_init(opt)
       self.agent:setSaliency(opt.saliency)
     end
   end
+    
+  if self.twoPlayers and paths.filep(opt2.network) then
+    -- Load saved agent if specified
+    log.info('Loading pretrained network2 weights')
+    self.agent2:loadWeights(opt2.network)
+  end
 
   -- Start gaming
   log.info('Starting game: ' .. opt.game)
@@ -63,7 +76,7 @@ function Master:_init(opt)
   end
 
   -- Set up validation (with display if available)
-  self.validation = Validation(opt, self.agent, self.env, self.display)
+  self.validation = Validation(opt, self.agent, self.env, self.display, self.opt2, self.agent2)
 
   classic.strict(self)
 end
@@ -80,6 +93,9 @@ function Master:train()
   -- Set environment and agent to training mode
   self.env:training()
   self.agent:training()
+  if self.twoPlayers then
+    self.agent2:training()
+  end
 
   -- Training variables (reported in verbose mode)
   local episode = 1
@@ -92,10 +108,14 @@ function Master:train()
     self.globals.step = step -- Pass step number to globals for use in other modules
 
     -- Observe results of previous transition (r, s', terminal') and choose next action (index)
-    local action = self.agent:observe(reward, state, terminal) -- As results received, learn in training mode
+    local actionA = self.agent:observe(reward, state, terminal) -- As results received, learn in training mode
+    local actionB = nil
+    if self.twoPlayers then
+      actionB = self.agent2:observe(-reward, state, terminal) -- As results received, learn in training mode
+    end
     if not terminal then
       -- Act on environment (to cause transition)
-      reward, state, terminal = self.env:step(action)
+      reward, state, terminal = self.env:step(actionA, actionB)
       -- Track score
       episodeScore = episodeScore + reward
     else
@@ -158,6 +178,13 @@ function Master:catchSigInt()
     if io.read() == 'y' then
       log.info('Saving agent')
       torch.save(paths.concat(self.experiments, self._id, 'agent.t7'), self.agent) -- Save agent to resume training
+    end
+    if self.twoPlayers then
+      log.info('Save agent2 (y/n)?')
+      if io.read() == 'y' then
+        log.info('Saving agent2')
+        torch.save(paths.concat(self.experiments, self._id2, 'agent.t7'), self.agent2) -- Save agent to resume training
+      end
     end
     log.warn('Exiting')
     os.exit(128 + signum)
