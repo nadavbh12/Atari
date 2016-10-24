@@ -19,7 +19,9 @@ function Master:_init(opt, opt2)
   self.valFreq = opt.valFreq
   self.experiments = opt.experiments
   self._id = opt._id
-  self._id2 = opt2._id
+  if opt2 then
+    self._id2 = opt2._id
+  end
   self.saveAgents = opt.saveAgents
   self.twoPlayers = opt.twoPlayers
 
