@@ -12,7 +12,6 @@ local opt = setup.opt
 local setup2 = nil
 local opt2 = nil
 
-print(opt.twoPlayers)
 if opt.twoPlayers then
   local f = assert(io.open(opt.playerTwoOptionsFile, "r"))
   local content = f:read("*a")
