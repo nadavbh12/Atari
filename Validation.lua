@@ -154,7 +154,9 @@ function Validation:evaluate()
   -- Set environment and agent to evaluation mode
   self.env:evaluate()
   self.agent:evaluate()
-  self.agent2:evaluate()
+  if self.agent2 then
+    self.agent2:evaluate()
+  end
   
   local reward, state, terminal
   
@@ -174,7 +176,7 @@ function Validation:evaluate()
     while not terminal do
       -- Observe and choose next action (index)
       actionA = self.agent:observe(reward, state, terminal)
-      if self.self.agent2 then
+      if self.agent2 then
         actionB = self.agent2:observe(-reward, state, terminal)
       else
         actionB = nil
