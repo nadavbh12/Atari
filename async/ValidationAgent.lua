@@ -174,7 +174,7 @@ function ValidationAgent:validate()
     self:saveWeights('best')
   end
 -- saving results
-  self.rFile:write(valTotalScore .."\t "..valTotalScore.."\t "..avgV .."\n")
+  self.rFile:write(valTotalScore .."\t "..valAvgScore.."\t "..avgV .."\n")
   self.rFile:flush()
   if self.reportWeights then
     local reports = self:weightsReport()
