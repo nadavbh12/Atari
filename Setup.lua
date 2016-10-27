@@ -201,7 +201,7 @@ function Setup:parseOptions(arg)
   if opt.game == 'mortal_kombat.sfc' then
     numActions = 23
   elseif opt.game == 'f_zero.sfc' or opt.game == 'f_zero_no_speed.sfc' then
-    numActions = 5
+    numActions = 20
   elseif opt.game == 'final_fight.sfc' then
     numActions = 17
   elseif opt.game == 'gradius_iii.sfc' then
