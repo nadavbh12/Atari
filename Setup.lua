@@ -200,7 +200,7 @@ function Setup:parseOptions(arg)
   local numActions = nil
   if opt.game == 'mortal_kombat.sfc' then
     numActions = 23
-  elseif opt.game == 'f_zero.sfc' then
+  elseif opt.game == 'f_zero.sfc' or opt.game == 'f_zero_no_speed.sfc' then
     numActions = 5
   elseif opt.game == 'final_fight.sfc' then
     numActions = 17

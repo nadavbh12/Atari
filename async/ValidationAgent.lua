@@ -10,6 +10,9 @@ require 'classic.torch'
 local ValidationAgent = classic.class('ValidationAgent')
 
 function ValidationAgent:_init(opt, theta, atomic)
+  self.rFile = io.open(paths.concat(opt.experiments,opt._id, "Results.txt"), "w")
+  self.rFile:write("Total Score\t Average Score\t Averaged Q\n")
+  self.rFile:flush()  
   log.info('creating ValidationAgent')
   local asyncModel = AsyncModel(opt)
   self.env, self.model = asyncModel:getEnvAndModel()
@@ -170,7 +173,9 @@ function ValidationAgent:validate()
     self.bestValScore = valAvgScore
     self:saveWeights('best')
   end
-
+-- saving results
+  self.rFile:write(valTotalScore .."\t "..valTotalScore.."\t "..avgV .."\n")
+  self.rFile:flush()
   if self.reportWeights then
     local reports = self:weightsReport()
     for r = 1, #reports do
