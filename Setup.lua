@@ -138,6 +138,7 @@ function Setup:parseOptions(arg)
   cmd:option('-valFreq', 250000, 'Interval of steps between validating agent') -- valFreq steps is used as an epoch, hence #epochs = steps/valFreq
   cmd:option('-valSteps', 125000, 'Number of steps to use for validation')
   cmd:option('-valSize', 500, 'Number of transitions to use for calculating validation statistics')
+   cmd:option('-saveAgents', 50 , 'Number of agents to save')  
   -- Async options
   cmd:option('-async', '', 'Async agent: <none>|Sarsa|OneStepQ|NStepQ|A3C') -- TODO: Change names
   cmd:option('-rmsEpsilon', 0.1, 'Epsilon for sharedRmsProp')
@@ -158,7 +159,8 @@ function Setup:parseOptions(arg)
   cmd:option('-saliency', '', 'Display saliency maps (requires QT): <none>|normal|guided|deconvnet')
   cmd:option('-record', 'false', 'Record screen (only in eval mode)')
   cmd:option('-evalEpisodes', '1', 'Number of episodes in evaluation mode')
-  cmd:option('-saveAgents', 50 , 'Number of agents to save')  
+  cmd:option('-evalSteps', 4500 , 'Number of steps before terminition')  -- 4500 = 60/4*300 (frams_per_sec / actrep * sec)
+  
   local opt = cmd:parse(arg)
 
   -- Process boolean options (Torch fails to accept false on the command line)

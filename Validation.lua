@@ -173,7 +173,7 @@ function Validation:evaluate()
     local actionB = nil
   
     local step = 1
-    while not terminal do
+    while not terminal and (step<self.opt.evalSteps) do
       -- Observe and choose next action (index)
       actionA = self.agent:observe(reward, state, terminal)
       if self.agent2 then
