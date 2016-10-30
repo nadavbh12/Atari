@@ -42,7 +42,7 @@ Requires [Torch7](http://torch.ch/), and uses CUDA if available. Also requires t
 xitari, alewrap and rlenvs can be installed using the following commands:
 
 ```sh
-luarocks install https://raw.githubusercontent.com/nadavbh12/Arcade-Learning-Environment-2.0/master/ale-2-0.rockspec
+luarocks install https://raw.githubusercontent.com/nadavbh12/Retro-Learning-Environment/master/ale-2-0.rockspec
 luarocks install https://raw.githubusercontent.com/nadavbh12/alewrap/master/alewrap-0-0.rockspec
 luarocks install https://raw.githubusercontent.com/nadavbh12/rlenvs/master/rocks/rlenvs-scm-1.rockspec
 ```
