@@ -208,6 +208,8 @@ function Setup:parseOptions(arg)
     numActions = 20
   elseif opt.game == 'super_mario_all_stars.sfc' then
     numActions = 11
+  elseif opt.game == 'wolfenstein.sfc' then
+    numActions = 18
   end
   
   opt.actionSpec = {'int', 1, {1, numActions}}
